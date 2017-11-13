@@ -26,7 +26,7 @@
 (require 'ob)
 
 (defvar org-babel-default-header-args:influxdb
-  `((:results . "org"))
+  `((:results . "raw"))
   "Default arguments for evaluating an influxdb block.")
 
 (defun org-babel-execute:influxdb (body input-params)
@@ -70,8 +70,7 @@
      (add-to-list 'org-src-lang-modes '("influxdb" . "ob-influxdb"))
      (add-to-list 'org-structure-template-alist
                   `(,org-babel-influxdb-template-selector
-                    "#+BEGIN_SRC influxdb :host localhost :db telegraf "
-                    ":precision rfc3339 ?\n\n#+END_SRC"))))
+                    "#+BEGIN_SRC influxdb :host localhost :db telegraf :precision rfc3339 \n?\n#+END_SRC\n"))))
 
 
 (provide 'ob-influxdb)
