@@ -46,21 +46,25 @@
         (unless precision
           (setq precision "rfc3339"))
         (insert body)
-        (shell-command-on-region
+        (let ((cmd-status (shell-command-on-region
          (point-min)
          (point-max)
-         ;;; csv format adds the measurement name as first column, so skip it
+         ;; csv format adds the measurement name as first column, so skip it
          (format "influx -database %s -precision %s -host %s -format csv -execute \"%s\" | cut -d, -f2-"
                  database precision host body)
          (current-buffer)
          t
          "*InfluxDB Result Buffer*"
-         t)
-        (org-table-convert-region (point-min) (point-max) '(4))
-        (org-table-insert-hline)
-        (buffer-substring (point-min) (point-max))
-        )))
-
+         t)))
+          ;; influx client returns success (0 return code) when there
+          ;; is no output (eg: bad measurement name)
+          (when (and (equal cmd-status 0)
+                      (not (equal (point-min) (point-max))))
+            (org-table-convert-region (point-min) (point-max) '(4))
+            (org-table-insert-hline)
+            (buffer-substring (point-min) (point-max))
+           )))))
+             
 (defcustom org-babel-influxdb-template-selector
   "I"
   "Character to enter after '<' to trigger template insertion."
